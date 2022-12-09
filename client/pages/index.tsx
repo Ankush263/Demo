@@ -5,7 +5,7 @@ import ABI from "../utils/CustomeERC20.json"
 import {ethers} from "ethers"
 
 const Home: NextPage = () => {
-  const deployedAddress = "0xDBAb1AA3FB6A08E7d662cc039958A2cF8cE39496"
+  const deployedAddress = "0x2DC52Cfd2d9e721a6108a3a43C16ED1574A442d7"
   const [connected, setConnected] = useState(false)
   const [balance, setBalance] = useState(0)
   const [tokenAmount, setTokenAmount] = useState(0)
@@ -14,7 +14,7 @@ const Home: NextPage = () => {
   const addAsset = async () => {
     try {
       if (typeof window.ethereum !== 'undefined') {
-        const tokenSymbol = "STK"
+        const tokenSymbol = "STX"
         const tokenDecimals = 18
         const wasAdded = window.ethereum.request({
           method: 'wallet_watchAsset',
@@ -36,14 +36,28 @@ const Home: NextPage = () => {
   const connect = async () => {
     setConnected(true)
     try {
-      if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.request({ method: 'eth_requestAccounts' });
+      if (typeof window !== 'undefined') {
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+        if(chainId != '0x5') {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x5' }],
+          })
+        }
+        await window.ethereum.request({ method: 'eth_requestAccounts' })
+        addAsset()
       }
-      addAsset()
     } catch (error) {
       console.log(error)
     }
   }
+
+  useEffect(() => {
+    window.ethereum.on('accountsChanged', (account: any) => {
+      window.location.replace(location.pathname)
+    })
+  }, [])
+  
 
   const Faucet = async () => {
     try {
@@ -67,9 +81,10 @@ const Home: NextPage = () => {
       if (typeof window.ethereum !== 'undefined') {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner()
+        const address = await signer.getAddress()
         const abi = ABI.abi;
         const contract = new ethers.Contract(deployedAddress, abi, signer)
-        const balance = await contract.showBalance()
+        const balance = await contract.balanceOf(address)
         setBalance(balance.toString())
       }
     } catch (error) {
@@ -85,7 +100,7 @@ const Home: NextPage = () => {
         const abi = ABI.abi;
         const contract = new ethers.Contract(deployedAddress, abi, signer)
         console.log(tokenAmount, sendAddress)
-        const transaction = await contract.transferToken(sendAddress, tokenAmount)
+        const transaction = await contract.transfer(sendAddress, tokenAmount)
         await transaction.wait()
         alert("Transaction successfull")
       }
@@ -99,7 +114,7 @@ const Home: NextPage = () => {
       <button disabled={connected} onClick={connect}>Connect Wallet</button>
       <hr />
       <button disabled={!connected} onClick={Faucet}>Faucet</button>
-      <span>--------(This faucet only works if you have less then 10 STK Tokens)</span>
+      <span>--------(This faucet only works if you have less then 10 STX Tokens)</span>
       <br />
       <button disabled={!connected} onClick={showBalance}>Show Balance</button>
       <span>Your Balance is: {balance}</span>

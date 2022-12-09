@@ -2,7 +2,13 @@
 
 pragma solidity ^0.8.9;
 
- contract CustomeERC20 {
+interface ERC20Interface{
+  function totalSupply() external view returns(uint);
+  function balanceOf(address tokenOwner) external view returns(uint balance);
+  function transfer(address to, uint tokens)external returns(bool success);
+}
+
+contract CustomeERC20 is ERC20Interface {
 
   // address of the owner of the token
   address public owner;
@@ -28,8 +34,8 @@ pragma solidity ^0.8.9;
   }
 
   // with this function user can see their token balance
-  function showBalance() public view returns(uint256) {
-    return balance[msg.sender];
+  function balanceOf(address _tokenOwner) public view returns(uint256) {
+    return balance[_tokenOwner];
   }
 
   // with the help of this faucet, user can take 10 tokens at a time.
@@ -42,7 +48,7 @@ pragma solidity ^0.8.9;
   }
 
   // With the help of this function, user can transfer any amount of token to another address.
-  function transferToken(address _to, uint256 _amount) public returns(bool success) {
+  function transfer(address _to, uint256 _amount) public returns(bool success) {
     require(balance[msg.sender] >= _amount, "You don't have enough token");
     balance[msg.sender] -= _amount;
     balance[_to] += _amount;
