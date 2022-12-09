@@ -1,11 +1,12 @@
-import { ethers } from "hardhat";
+import ethers from "@nomiclabs/hardhat-ethers";
+const hre = require("hardhat")
 
 async function main() {
   const TokenName = "StreaX"
   const TokenSymbol = "STX"
   const TotalSupply = 1000
   const Decimal = 18
-  const CustomeERC20 = await ethers.getContractFactory("CustomeERC20")
+  const CustomeERC20 = await hre.ethers.getContractFactory("CustomeERC20")
   const customeERC20 = await CustomeERC20.deploy(TokenName, TokenSymbol, TotalSupply, Decimal)
   await customeERC20.deployed()
   console.log(

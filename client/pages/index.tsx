@@ -5,7 +5,7 @@ import ABI from "../utils/CustomeERC20.json"
 import {ethers} from "ethers"
 
 const Home: NextPage = () => {
-  const deployedAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+  const deployedAddress = "0xDBAb1AA3FB6A08E7d662cc039958A2cF8cE39496"
   const [connected, setConnected] = useState(false)
   const [balance, setBalance] = useState(0)
   const [tokenAmount, setTokenAmount] = useState(0)
